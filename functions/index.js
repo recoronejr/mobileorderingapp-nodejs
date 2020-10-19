@@ -30,7 +30,7 @@ const scopes = ["ITEMS_READ", "MERCHANT_PROFILE_READ", "PAYMENTS_WRITE_ADDITIONA
 
 /**
  * Description:
- *  Serves the link that merchants click to authorize your application
+ *  Serves the link that merchants click to authorize your application. For Sandbox Authentication, Sandbox Test Page must be open in web browser
  */
 app.get("/sandbox_request_token", (req, res) => {
     // Set the Auth_State cookie with a random md5 string to protect against cross-site request forgery.
@@ -44,26 +44,29 @@ app.get("/sandbox_request_token", (req, res) => {
     )
 });
 
-app.get('/revokeToken', (req,res) => {
+// app.get('/revokeToken', (req,res) => {
 
-    // Configure API key authorization: oauth2ClientSecret
-    var oauth2ClientSecret = defaultClient.authentications['oauth2ClientSecret'];
-    oauth2ClientSecret.apiKey = 'sandbox-sq0csb-cwewxff48gzLcg456a__tNVUDjWTbAYnTrcYXZO-EMU';
-    oauth2ClientSecret.apiKeyPrefix = 'Client';
-
-    var apiInstance = new SquareConnect.OAuthApi();
-
-    var body = new SquareConnect.RevokeTokenRequest(); // RevokeTokenRequest | An object containing the fields to POST for the request.  See the corresponding object definition for field details.
+//     // Configure API key authorization: oauth2ClientSecret
+//     var oauth2ClientSecret = defaultClient.authentications['oauth2ClientSecret'];
+//     oauth2ClientSecret.apiKey = 'sandbox-sq0csb-cwewxff48gzLcg456a__tNVUDjWTbAYnTrcYXZO-EMU';
+//     oauth2ClientSecret.apiKeyPrefix = 'Client';
     
-    body.client_id = 'sandbox-sq0idb-t-jIA6FAF_aEw9ae5dOMbg';
-    body.access_token = 'EAAAEMA8lB2Qruo8oqylt_bQnRtxFf8dd2ugyRzzuC59gBPDs8RBSvwGR8zwqMX4';
+//     var apiInstance = new SquareConnect.OAuthApi();
 
-    apiInstance.revokeToken(body).then(function(data) {
-        res.send(data)
-    }, function(error) {
-        res.send(error);
-    });
-});
+//     var body = new SquareConnect.RevokeTokenRequest(); // RevokeTokenRequest | An object containing the fields to POST for the request.  See the corresponding object definition for field details.
+//     body.client_id = 'sandbox-sq0idb-t-jIA6FAF_aEw9ae5dOMbg';
+//     body.access_token = 'EAAAEMA8lB2Qruo8oqylt_bQnRtxFf8dd2ugyRzzuC59gBPDs8RBSvwGR8zwqMX4';
+
+//         apiInstance.revokeToken(body).then(function(data) {
+//             res.send(data)
+//         }, function(error) {
+//             res.send(error);
+//         });  
+//     } catch (error) {
+//         return res.send(error)
+//     }
+   
+// });
 // Method to get all Menu Items
 // merchants.getMenuItemsForEachMerchant()
 
@@ -111,11 +114,11 @@ app.get('/sandbox_callback', (req, res) => {
                 // we call a function that writes the tokens to the page so we can easily copy and use them directly.
                 // In production, you should never write tokens to the page. You should encrypt the tokens and handle them securely.
                 res.send(messages.writeTokensOnSuccess(data.access_token, data.refresh_token, data.expires_at, data.merchant_id))
-                merchants.saveMerchantOath(data.access_token, data.refresh_token, data.expires_at, data.merchant_id);
+                return merchants.saveMerchantOath(data.access_token, data.refresh_token, data.expires_at, data.merchant_id);
             })
             // The response from the Obtain Token endpoint did not include an access token. Something went wrong.
             .catch(error => {
-                res.send(messages.displayError('Exception', error.response.body.message))
+                return res.send(messages.displayError('Exception', error.response.body.message))
             })
     }
     else {
