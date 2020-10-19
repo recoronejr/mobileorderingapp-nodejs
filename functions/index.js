@@ -1,32 +1,29 @@
 const functions = require('firebase-functions');
-
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const md5 = require('md5');
 const SquareConnect = require('square-connect');
+const admin = require('firebase-admin');
+
 const app = express();
 app.use(cookieParser());
 
 const port = process.env.PORT || "8000";
-const messages = require('./sandbox-messages')
-const config = require('./config.json')
+const messages = require('./sandbox-messages');
+const config = require('./config.json');
 const merchants = require('./merchants');
 
+admin.initializeApp();
+
 // Configure Square defcault client
-const defaultClient = SquareConnect.ApiClient.instance
-defaultClient.basePath = config.SQ_SANDBOX_BASEURL
-
-
-
+const defaultClient = SquareConnect.ApiClient.instance;
+defaultClient.basePath = config.SQ_SANDBOX_BASEURL;
 // Configure Square OAuth API instance
 const oauthInstance = new SquareConnect.OAuthApi();
 
 // INCLUDE PERMISSIONS YOU WANT YOUR SELLER TO GRANT YOUR APPLICATION
 const scopes = ["ITEMS_READ", "MERCHANT_PROFILE_READ", "PAYMENTS_WRITE_ADDITIONAL_RECIPIENTS", "PAYMENTS_WRITE", "PAYMENTS_READ"]
+
 
 /**
  * Description:
@@ -44,36 +41,9 @@ app.get("/sandbox_request_token", (req, res) => {
     )
 });
 
-// app.get('/revokeToken', (req,res) => {
-
-//     // Configure API key authorization: oauth2ClientSecret
-//     var oauth2ClientSecret = defaultClient.authentications['oauth2ClientSecret'];
-//     oauth2ClientSecret.apiKey = 'sandbox-sq0csb-cwewxff48gzLcg456a__tNVUDjWTbAYnTrcYXZO-EMU';
-//     oauth2ClientSecret.apiKeyPrefix = 'Client';
-    
-//     var apiInstance = new SquareConnect.OAuthApi();
-
-//     var body = new SquareConnect.RevokeTokenRequest(); // RevokeTokenRequest | An object containing the fields to POST for the request.  See the corresponding object definition for field details.
-//     body.client_id = 'sandbox-sq0idb-t-jIA6FAF_aEw9ae5dOMbg';
-//     body.access_token = 'EAAAEMA8lB2Qruo8oqylt_bQnRtxFf8dd2ugyRzzuC59gBPDs8RBSvwGR8zwqMX4';
-
-//         apiInstance.revokeToken(body).then(function(data) {
-//             res.send(data)
-//         }, function(error) {
-//             res.send(error);
-//         });  
-//     } catch (error) {
-//         return res.send(error)
-//     }
-   
-// });
-// Method to get all Menu Items
-// merchants.getMenuItemsForEachMerchant()
-
 app.get('/listMerchantsOauth', (req,res) => {
     const data = require('./merchants.json')
-    res.send(JSON.stringify(data,null,2))
-
+    res.send(JSON.stringify(data,0,2))
 });
 
 app.get('/sandbox_callback', (req, res) => {
