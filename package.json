@@ -1,0 +1,25 @@
+{
+  "name": "mobileorderingapp-nodejs",
+  "version": "1.0.0",
+  "description": "Square Admin Authentication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recoronejr/mobileorderingapp-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/recoronejr/mobileorderingapp-nodejs/issues"
+  },
+  "homepage": "https://github.com/recoronejr/mobileorderingapp-nodejs#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "md5": "^2.3.0",
+    "square-connect": "^4.20200923.4"
+  }
+}
