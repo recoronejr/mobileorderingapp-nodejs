@@ -4,22 +4,17 @@ const cookieParser = require('cookie-parser');
 const md5 = require('md5');
 const SquareConnect = require('square-connect');
 const admin = require('firebase-admin');
-
-const app = express();
-app.use(cookieParser());
-
-const port = process.env.PORT || "8000";
 const messages = require('./sandbox-messages');
 const config = require('./config.json');
 const merchants = require('./merchants');
+const cors = require('cors')
+const app = express();
 
 admin.initializeApp();
+app.use(cookieParser());
+// Automatically allow cross-origin requests
+app.use(cors({ origin: true }));
 
-// Configure Square defcault client
-const defaultClient = SquareConnect.ApiClient.instance;
-defaultClient.basePath = config.SQ_SANDBOX_BASEURL;
-// Configure Square OAuth API instance
-const oauthInstance = new SquareConnect.OAuthApi();
 
 // INCLUDE PERMISSIONS YOU WANT YOUR SELLER TO GRANT YOUR APPLICATION
 const scopes = ["ITEMS_READ", "MERCHANT_PROFILE_READ", "PAYMENTS_WRITE_ADDITIONAL_RECIPIENTS", "PAYMENTS_WRITE", "PAYMENTS_READ"]
@@ -41,10 +36,72 @@ app.get("/sandbox_request_token", (req, res) => {
     )
 });
 
-app.get('/listMerchantsOauth', (req,res) => {
+var merchantsData = {
+    locations: getLocations(),
+    menus: getMenus(),
+};
+function getLocations() {
+    var defaultClient = SquareConnect.ApiClient.instance;
+    defaultClient.basePath = 'https://connect.squareupsandbox.com';
     const data = require('./merchants.json')
-    res.send(JSON.stringify(data,0,2))
+    const merchants = data.merchants
+    var locationsArray = []; 
+    for (var i = 0; i < merchants.length; i++) {
+        // Configure OAuth2 access token for authorization: oauth2
+        const oauth2 = defaultClient.authentications['oauth2'];
+        // Set sandbox access token
+        oauth2.accessToken = merchants[i].access_token;
+        // Pass client to API
+        const api = new SquareConnect.LocationsApi();
+        
+        api.listLocations().then(function(data) {
+            // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
+            locationsArray.push(data.locations[0]);
+          }, function(error) {
+            console.error(error);
+        });
+    }
+    return locationsArray
+}
+function getMenus() {
+    var defaultClient = SquareConnect.ApiClient.instance;
+    defaultClient.basePath = 'https://connect.squareupsandbox.com';
+    const data = require('./merchants.json')
+    const merchants = data.merchants
+    var menusArray = []; 
+    var apiInstance = new SquareConnect.CatalogApi();
+
+    for (var i = 0; i < merchants.length; i++) {
+        // Configure OAuth2 access token for authorization: oauth2
+        const oauth2 = defaultClient.authentications['oauth2'];
+        // Set sandbox access token
+        oauth2.accessToken = merchants[i].access_token;
+        var opts = { 
+            'cursor': "", // String | The pagination cursor returned in the previous response. Leave unset for an initial request. See [Pagination](https://developer.squareup.com/docs/basics/api101/pagination) for more information.
+            'types': "ITEM,IMAGE" // String | An optional case-insensitive, comma-separated list of object types to retrieve, for example `ITEM,ITEM_VARIATION,CATEGORY,IMAGE`.  The legal values are taken from the CatalogObjectType enum: `ITEM`, `ITEM_VARIATION`, `CATEGORY`, `DISCOUNT`, `TAX`, `MODIFIER`, `MODIFIER_LIST`, or `IMAGE`.
+        };
+        apiInstance.listCatalog(opts).then(function(data) {
+            // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
+            menusArray.push(data.objects);
+        }, function(error) {
+            console.error(error);
+        });   
+    }
+    return menusArray
+}
+app.get('/getMerchantsLocations', (req,res) => {
+    res.send(merchantsData.locations)
 });
+
+app.get('/getMerchantsMenus', (req,res) => {
+    res.send(merchantsData.menus)
+});
+
+
+
+
+
+
 
 app.get('/sandbox_callback', (req, res) => {
     console.log(req.query)

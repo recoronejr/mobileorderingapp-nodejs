@@ -19,6 +19,7 @@
   "homepage": "https://github.com/recoronejr/mobileorderingapp-nodejs#readme",
   "dependencies": {
     "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "md5": "^2.3.0",
     "square-connect": "^4.20200923.4"
   }
