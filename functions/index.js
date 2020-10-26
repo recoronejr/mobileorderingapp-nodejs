@@ -57,9 +57,11 @@ function getLocations() {
         api.listLocations().then(function(data) {
             // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
             locationsArray.push(data.locations[0]);
+            return locationsArray;
           }, function(error) {
             console.error(error);
-        });
+        })
+        .catch();
     }
     return locationsArray
 }
@@ -83,9 +85,11 @@ function getMenus() {
         apiInstance.listCatalog(opts).then(function(data) {
             // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
             menusArray.push(data.objects);
+            return menusArray;
         }, function(error) {
             console.error(error);
-        });   
+        })
+        .catch();   
     }
     return menusArray
 }
