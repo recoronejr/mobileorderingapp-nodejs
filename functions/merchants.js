@@ -1,6 +1,4 @@
 var fs = require('fs');
-var SquareConnect = require('square-connect');
-var defaultClient = SquareConnect.ApiClient.instance;
 
 module.exports = {
 
@@ -23,14 +21,14 @@ module.exports = {
                 const json = JSON.stringify(file, null, 2);
          
                 fs.writeFile('./merchants.json', json, 'utf8', function(err){
-                     if(err){ 
+                    if(err){ 
                            return console.log(err); 
-                     } else {
+                    } else {
                            //Everything went OK!
                            return console.log("Merchant Added");
-                     }});
+                    }});
             }  
-         });
+        });
     }
 
 }

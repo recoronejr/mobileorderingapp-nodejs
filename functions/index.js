@@ -8,6 +8,7 @@ const messages = require('./sandbox-messages');
 const config = require('./config.json');
 const merchants = require('./merchants');
 const cors = require('cors')
+const oauthInstance = new SquareConnect.OAuthApi();
 const app = express();
 
 admin.initializeApp();
@@ -70,28 +71,35 @@ function getMenus() {
     defaultClient.basePath = 'https://connect.squareupsandbox.com';
     const data = require('./merchants.json')
     const merchants = data.merchants
-    var menusArray = []; 
-    var apiInstance = new SquareConnect.CatalogApi();
+    var menus = {}; 
+    let apiInstance = new SquareConnect.CatalogApi();
 
-    for (var i = 0; i < merchants.length; i++) {
+    for (let i = 0; i < merchants.length; i++) {
         // Configure OAuth2 access token for authorization: oauth2
         const oauth2 = defaultClient.authentications['oauth2'];
         // Set sandbox access token
         oauth2.accessToken = merchants[i].access_token;
-        var opts = { 
+        let opts = { 
             'cursor': "", // String | The pagination cursor returned in the previous response. Leave unset for an initial request. See [Pagination](https://developer.squareup.com/docs/basics/api101/pagination) for more information.
             'types': "ITEM,IMAGE" // String | An optional case-insensitive, comma-separated list of object types to retrieve, for example `ITEM,ITEM_VARIATION,CATEGORY,IMAGE`.  The legal values are taken from the CatalogObjectType enum: `ITEM`, `ITEM_VARIATION`, `CATEGORY`, `DISCOUNT`, `TAX`, `MODIFIER`, `MODIFIER_LIST`, or `IMAGE`.
         };
         apiInstance.listCatalog(opts).then(function(data) {
             // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
-            menusArray.push(data.objects);
-            return menusArray;
+            let merchant_id = merchants[i].merchant_id.toString()
+            let menu = {
+                [merchant_id] : {
+                    id: merchant_id,
+                    items: data.objects 
+                }
+            }   
+            menus[merchant_id] = menu
+            return menus
         }, function(error) {
             console.error(error);
         })
         .catch();   
     }
-    return menusArray
+    return menus
 }
 app.get('/getMerchantsLocations', (req,res) => {
     res.send(merchantsData.locations)
@@ -101,19 +109,11 @@ app.get('/getMerchantsMenus', (req,res) => {
     res.send(merchantsData.menus)
 });
 
-
-
-
-
-
-
 app.get('/sandbox_callback', (req, res) => {
-    console.log(req.query)
     // Verify the state to protect against cross-site request forgery.
     if (req.cookies["Auth_State"] !== req.query['state']) {
         res.send(messages.displayStateError())
     }
-
     else if (req.query['error']) {
         // Check to see if the seller clicked the Deny button and handle it as a special case.
         if(("access_denied" === req.query['error']) && ("user_denied" === req.query["error_description"])) {
@@ -128,16 +128,16 @@ app.get('/sandbox_callback', (req, res) => {
     // and the authorization page returned the auth tokens.
     else if ("code" === req.query["response_type"]) {
         // Extract the returned authorization code from the URL
-        var code = req.query.code
+        let code = req.query.code
 
-         // Provide the code in a request to the Obtain Token endpoint
-         var body = {
+        // Provide the code in a request to the Obtain Token endpoint
+        let body = {
             client_id : config.SQ_SANDBOX_APP_ID,
             client_secret : config.SQ_SANDBOX_APP_SECRET,
             code : code,
             grant_type : 'authorization_code',
         }
-
+        const oauthInstance = new SquareConnect.OAuthApi();
         oauthInstance.obtainToken(body)
             // Extract the returned access token from the ObtainTokenResponse object
             .then(data => {
