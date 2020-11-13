@@ -87,10 +87,9 @@ function getMenus() {
             // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
             let merchant_id = merchants[i].merchant_id.toString()
             let menu = {
-                [merchant_id] : {
-                    id: merchant_id,
-                    items: data.objects 
-                }
+                id: merchant_id,
+                items: data.objects 
+    
             }   
             menus[merchant_id] = menu
             return menus
