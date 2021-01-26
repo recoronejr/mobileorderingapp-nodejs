@@ -89,6 +89,7 @@ function getMenus() {
             let access_token = merchants[i].access_token.toString()
             let menu = {
                 id: merchant_id,
+                token: access_token,
                 items: data.objects 
     
             }   
