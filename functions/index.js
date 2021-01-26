@@ -86,6 +86,7 @@ function getMenus() {
         apiInstance.listCatalog(opts).then(function(data) {
             // console.log('API called successfully. Returned data: ' + JSON.stringify(data, 0, 1));
             let merchant_id = merchants[i].merchant_id.toString()
+            let access_token = merchants[i].access_token.toString()
             let menu = {
                 id: merchant_id,
                 items: data.objects 
