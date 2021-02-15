@@ -66,6 +66,18 @@ function getLocations() {
     }
     return locationsArray
 }
+function createOrder(lineItems,){
+    let defaultClient = SquareConnect.ApiClient.instance;
+    defaultClient.basePath = 'https://connect.squareupsandbox.com';
+    let api = new SquareConnect.OrdersApi();
+    try {
+        api.createOrder();
+    } catch (error) {
+        
+    }
+
+
+}
 function getMenus() {
     var defaultClient = SquareConnect.ApiClient.instance;
     defaultClient.basePath = 'https://connect.squareupsandbox.com';
@@ -91,7 +103,6 @@ function getMenus() {
                 id: merchant_id,
                 token: access_token,
                 items: data.objects 
-    
             }   
             menus[merchant_id] = menu
             return menus
@@ -109,6 +120,11 @@ app.get('/getMerchantsLocations', (req,res) => {
 app.get('/getMerchantsMenus', (req,res) => {
     res.send(merchantsData.menus)
 });
+
+/**
+ * Description:
+ * Create order using square Api
+ */
 
 app.get('/sandbox_callback', (req, res) => {
     // Verify the state to protect against cross-site request forgery.
