@@ -66,18 +66,18 @@ function getLocations() {
     }
     return locationsArray
 }
-function createOrder(lineItems,){
-    let defaultClient = SquareConnect.ApiClient.instance;
-    defaultClient.basePath = 'https://connect.squareupsandbox.com';
-    let api = new SquareConnect.OrdersApi();
-    try {
-        api.createOrder();
-    } catch (error) {
+// function createOrder(lineItems,){
+//     let defaultClient = SquareConnect.ApiClient.instance;
+//     defaultClient.basePath = 'https://connect.squareupsandbox.com';
+//     let api = new SquareConnect.OrdersApi();
+//     try {
+//         api.createOrder();
+//     } catch (error) {
         
-    }
+//     }
 
 
-}
+// }
 function getMenus() {
     var defaultClient = SquareConnect.ApiClient.instance;
     defaultClient.basePath = 'https://connect.squareupsandbox.com';
